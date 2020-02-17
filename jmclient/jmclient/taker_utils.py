@@ -5,7 +5,6 @@ import os
 import sys
 import time
 import numbers
-from binascii import hexlify
 
 from jmbase import get_log, jmprint
 from .configure import jm_single, validate_address, is_burn_destination
@@ -13,8 +12,7 @@ from .schedule import human_readable_schedule_entry, tweak_tumble_schedule,\
     schedule_to_text
 from .wallet import BaseWallet, estimate_tx_fee, compute_tx_locktime, \
     FidelityBondMixin
-from jmbitcoin import deserialize, make_shuffled_tx, serialize, txhash,\
-    amount_to_str, mk_burn_script, bin_hash160
+from jmbitcoin import make_shuffled_tx, amount_to_str, mk_burn_script
 from jmbase.support import EXIT_SUCCESS
 log = get_log()
 
