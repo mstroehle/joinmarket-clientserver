@@ -134,8 +134,16 @@ def direct_send(wallet_service, amount, mixdepth, destination, answeryes=False,
     log.info("Using a fee of : " + amount_to_str(fee_est) + ".")
     if amount != 0:
         log.info("Using a change value of: " + amount_to_str(changeval) + ".")
-    tx = make_shuffled_tx(list(utxos.keys()), outs, 2, compute_tx_locktime())
-        list(utxos.keys()), outs, 2, tx_locktime), utxos)
+    tx = make_shuffled_tx(list(utxos.keys()), outs, 2, tx_locktime)
+
+    newpsbt = wallet_service.create_psbt_from_tx(tx, wallet_service.utxos_to_txouts(utxos))
+    print(newpsbt)
+    serialized_signed_psbt, err = wallet_service.sign_psbt(newpsbt.serialize())
+    if err != None:
+        print("Could not sign psbt, error: ", err)
+    else:
+        print(bintohex(serialized_signed_psbt))
+
     inscripts = {}
     for i, txinp in enumerate(tx.vin):
         u = (txinp.prevout.hash[::-1], txinp.prevout.n)
