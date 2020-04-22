@@ -21,7 +21,8 @@ Currently re-used by CLI script tumbler.py and joinmarket-qt
 """
 
 def direct_send(wallet_service, amount, mixdepth, destination, answeryes=False,
-                accept_callback=None, info_callback=None):
+                accept_callback=None, info_callback=None,
+                return_transaction=False):
     """Send coins directly from one mixdepth to one destination address;
     does not need IRC. Sweep as for normal sendpayment (set amount=0).
     If answeryes is True, callback/command line query is not performed.
@@ -38,7 +39,8 @@ def direct_send(wallet_service, amount, mixdepth, destination, answeryes=False,
     pushed), and returns nothing.
 
     This function returns:
-    The txid if transaction is pushed, False otherwise
+    The txid if transaction is pushed, False otherwise,
+    or the full CMutableTransaction if return_transaction is True.
     """
     #Sanity checks
     assert validate_address(destination)[0] or is_burn_destination(destination)
@@ -165,7 +167,8 @@ def direct_send(wallet_service, amount, mixdepth, destination, answeryes=False,
     successmsg = "Transaction sent: " + txid
     cb = log.info if not info_callback else info_callback
     cb(successmsg)
-    return txid
+    txinfo = txid if not return_transaction else tx
+    return txinfo
 
 
 def sign_tx(wallet_service, tx, utxos):
