@@ -221,8 +221,8 @@ def print_jm_version(option, opt_str, value, parser):
 # and internal. See details in hexbin() docstring.
 
 def cv(x):
-    success, utxo = utxostr_to_utxo(x)
-    if success:
+    good, utxo = utxostr_to_utxo(x)
+    if good:
         return utxo
     else:
         try:
