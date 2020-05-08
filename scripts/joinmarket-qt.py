@@ -628,6 +628,7 @@ class SpendTab(QWidget):
                 self.waitingtxid=txid
                 self.restartTimer.timeout.connect(self.restartWaitWrap)
                 self.restartTimer.start(5000)
+                self.updateSchedView()
                 return
             self.updateSchedView()
         self.startJoin()
