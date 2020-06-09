@@ -1175,13 +1175,15 @@ class PSBTWalletMixin(object):
                 continue
             if isinstance(spent_outs[i], (btc.CTransaction, btc.CTxOut)):
                 # note that we trust the caller to choose Tx vs TxOut as according
-                # to non-witness/witness:
-                txinput.utxo = spent_outs[i]
+                # to non-witness/witness. Note also that for now this mixin does
+                # not attempt to provide previous tx (second argument) for witness
+                # case.
+                txinput.set_utxo(spent_outs[i], None)
             else:
                 assert False, "invalid spent output type passed into PSBT creator"
         # we now insert redeemscripts where that is possible and necessary:
         for i, txinput in enumerate(new_psbt.inputs):
-            if isinstance(txinput.utxo, btc.CTxOut):
+            if isinstance(txinput.witness_utxo, btc.CTxOut):
                 # witness
                 if txinput.utxo.scriptPubKey.is_witness_scriptpubkey():
                     # nothing needs inserting; the scriptSig is empty.
@@ -1228,7 +1230,7 @@ class PSBTWalletMixin(object):
         # then overwriting it is harmless (preimage resistance).
         if isinstance(self, SegwitLegacyWallet):
             for i, txinput in enumerate(new_psbt.inputs):
-                tu = txinput.utxo
+                tu = txinput.witness_utxo
                 if isinstance(tu, btc.CTxOut):
                     # witness
                     if tu.scriptPubKey.is_witness_scriptpubkey():

@@ -116,7 +116,7 @@ class JMPayjoinManager(object):
 
         # inputs must all have witness utxo populated
         for inp in self.initial_psbt.inputs:
-            if not inp.utxo and isinstance(inp.utxo, btc.CTxOut):
+            if not isinstance(inp.witness_utxo, btc.CTxOut):
                 return False
 
         # check that there is no xpub or derivation info
@@ -191,7 +191,7 @@ class JMPayjoinManager(object):
                 else:
                     receiver_input_indices.append(i)
 
-        if any([found[i] != 1 for i in range(len(found))]):
+        if any([f != 1 for f in found]):
             return (False, "Receiver proposed PSBT does not contain our inputs.")
         # 3
         found = 0
@@ -470,8 +470,8 @@ def process_payjoin_proposal_from_server(response_body, manager):
         for j, inp2 in enumerate(manager.initial_psbt.unsigned_tx.vin):
                     if (inp.prevout.hash, inp.prevout.n) == (
                         inp2.prevout.hash, inp2.prevout.n):
-                        payjoin_proposal_psbt.inputs[i].utxo = \
-                            manager.initial_psbt.inputs[j].utxo
+                        payjoin_proposal_psbt.inputs[i].set_utxo(
+                            manager.initial_psbt.inputs[j].utxo, None)
     signresultandpsbt, err = manager.wallet_service.sign_psbt(
         payjoin_proposal_psbt.serialize(), with_sign_result=True)
     if err:
@@ -499,5 +499,5 @@ def process_payjoin_proposal_from_server(response_body, manager):
     if not jm_single().bc_interface.pushtx(extracted_tx.serialize()):
         log.info("The above transaction failed to broadcast.")
     else:
-        log.info("Payjoin transactoin broadcast successfully.")
+        log.info("Payjoin transaction broadcast successfully.")
     reactor.stop()
