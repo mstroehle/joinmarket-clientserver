@@ -427,7 +427,7 @@ def send_payjoin(manager, accept_callback=None,
 def fallback_nonpayjoin_broadcast(manager, err):
     assert isinstance(manager, JMPayjoinManager)
     log.warn("Payjoin did not succeed, falling back to non-payjoin payment.")
-    log.warn("Error message was: " + str(err))
+    log.warn("Error message was: " + err.decode("utf-8"))
     original_tx = manager.initial_psbt.extract_transaction()
     if not jm_single().bc_interface.pushtx(original_tx.serialize()):
         log.error("Unable to broadcast original payment. The payment is NOT made.")
