@@ -1007,13 +1007,6 @@ class PSBTWalletMixin(object):
     def __init__(self, storage, **kwargs):
         super(PSBTWalletMixin, self).__init__(storage, **kwargs)
 
-    @staticmethod
-    def get_fee_from_psbt(in_psbt):
-        assert isinstance(in_psbt, btc.PartiallySignedTransaction)
-        spent = sum(in_psbt.get_input_amounts())
-        paid = sum((x.nValue for x in in_psbt.unsigned_tx.vout))
-        return spent - paid
-
     def is_input_finalized(self, psbt_input):
         """ This should be a convenience method in python-bitcointx.
         However note: this is not a static method and tacitly
@@ -1176,7 +1169,7 @@ class PSBTWalletMixin(object):
             if isinstance(spent_outs[i], (btc.CTransaction, btc.CTxOut)):
                 # note that we trust the caller to choose Tx vs TxOut as according
                 # to non-witness/witness. Note also that for now this mixin does
-                # not attempt to provide previous tx (second argument) for witness
+                # not attempt to provide unsigned-tx(second argument) for witness
                 # case.
                 txinput.set_utxo(spent_outs[i], None)
             else:

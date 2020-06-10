@@ -229,9 +229,11 @@ class JMPayjoinManager(object):
         # version (so all witnesses filled in) to calculate its size,
         # then compare that with the fee, and do the same for the
         # pre-existing non-payjoin.
-        gffp = PSBTWalletMixin.get_fee_from_psbt
-        proposed_tx_fee = gffp(signed_psbt_for_fees)
-        nonpayjoin_tx_fee = gffp(self.initial_psbt)
+        try:
+            proposed_tx_fee = signed_psbt_for_fees.get_fee()
+        except ValueError:
+            return (False, "receiver proposed tx has negative fee.")
+        nonpayjoin_tx_fee = self.initial_psbt.get_fee()
         proposed_tx_size = signed_psbt_for_fees.extract_transaction(
             ).get_virtual_size()
         nonpayjoin_tx_size = self.initial_psbt.extract_transaction(
