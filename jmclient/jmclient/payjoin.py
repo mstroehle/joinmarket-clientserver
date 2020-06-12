@@ -472,8 +472,8 @@ def process_payjoin_proposal_from_server(response_body, manager):
         for j, inp2 in enumerate(manager.initial_psbt.unsigned_tx.vin):
                     if (inp.prevout.hash, inp.prevout.n) == (
                         inp2.prevout.hash, inp2.prevout.n):
-                        payjoin_proposal_psbt.inputs[i].set_utxo(
-                            manager.initial_psbt.inputs[j].utxo, None)
+                        payjoin_proposal_psbt.set_utxo(
+                            manager.initial_psbt.inputs[j].utxo, i)
     signresultandpsbt, err = manager.wallet_service.sign_psbt(
         payjoin_proposal_psbt.serialize(), with_sign_result=True)
     if err:
