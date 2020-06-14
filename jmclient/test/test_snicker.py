@@ -47,7 +47,7 @@ def test_snicker_e2e(setup_snicker, nw, wallet_structures,
     
     assert tx, "Failed to spend from receiver wallet"
     print("Parent transaction OK. It was: ")
-    print(btc.hrt(tx))
+    print(btc.human_readable_transaction(tx))
     wallet_r.process_new_tx(tx)
     # we must identify the receiver's output we're going to use;
     # it can be destination or change, that's up to the proposer

@@ -331,16 +331,16 @@ class JMPayjoinManager(object):
         reportdict = {"name:", "PAYJOIN STATUS REPORT"}
         reportdict["status"] = self.pj_state # TODO: string
         if self.payment_tx:
-            txdata = btc.hrt(self.payment_tx)
+            txdata = btc.human_readable_transaction(self.payment_tx)
             if verbose:
                 txdata = txdata["hex"]
             reportdict["payment-tx"] = txdata
         if self.payjoin_psbt:
-            psbtdata = PSBTWalletMixin.hr_psbt(
+            psbtdata = PSBTWalletMixin.human_readable_psbt(
                 self.payjoin_psbt) if verbose else self.payjoin_psbt.to_base64()
             reportdict["payjoin-proposed"] = psbtdata
         if self.final_psbt:
-            finaldata = PSBTWalletMixin.hr_psbt(
+            finaldata = PSBTWalletMixin.human_readable_psbt(
                 self.final_psbt) if verbose else self.final_psbt.to_base64()
             reportdict["payjoin-final"] = finaldata
         if jsonified:
@@ -434,7 +434,7 @@ def fallback_nonpayjoin_broadcast(manager, err):
     if not jm_single().bc_interface.pushtx(original_tx.serialize()):
         log.error("Unable to broadcast original payment. The payment is NOT made.")
     log.info("We paid without coinjoin. Transaction: ")
-    log.info(btc.hrt(original_tx))
+    log.info(btc.human_readable_transaction(original_tx))
     reactor.stop()
 
 def receive_payjoin_proposal_from_server(response, manager):
@@ -465,7 +465,7 @@ def process_payjoin_proposal_from_server(response_body, manager):
         return
 
     log.debug("Receiver sent us this PSBT: ")
-    log.debug(manager.wallet_service.hr_psbt(payjoin_proposal_psbt))
+    log.debug(manager.wallet_service.human_readable_psbt(payjoin_proposal_psbt))
     # we need to add back in our utxo information to the received psbt,
     # since the servers remove it (not sure why?)
     for i, inp in enumerate(payjoin_proposal_psbt.unsigned_tx.vin):
@@ -491,13 +491,13 @@ def process_payjoin_proposal_from_server(response_body, manager):
     # All checks have passed. We can use the already signed transaction in
     # sender_signed_psbt.
     log.info("Our final signed PSBT is:\n{}".format(
-        manager.wallet_service.hr_psbt(sender_signed_psbt)))    
+        manager.wallet_service.human_readable_psbt(sender_signed_psbt)))
     manager.set_final_payjoin_psbt(sender_signed_psbt)
 
     # broadcast the tx
     extracted_tx = sender_signed_psbt.extract_transaction()
     log.info("Here is the final payjoin transaction:")
-    log.info(btc.hrt(extracted_tx))
+    log.info(btc.human_readable_transaction(extracted_tx))
     if not jm_single().bc_interface.pushtx(extracted_tx.serialize()):
         log.info("The above transaction failed to broadcast.")
     else:
